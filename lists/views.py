@@ -5,6 +5,5 @@ from django.shortcuts import render
 # Create your views here.
 
 def home_page(request):
-    html = '<html><title>TO-DO</title></html>'
-    return HttpResponse(html)
+    return render(request, 'home.html')
     pass
