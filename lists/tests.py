@@ -30,8 +30,15 @@ class HomepageTest(TestCase):
 
     def test_can_save_post_request(self):
         response = self.client.post('/', data={'item_text': 'a new list item'})
-        self.assertIn('a new list item', response.content.decode())
-        self.assertTemplateUsed(response, 'home.html')
+
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, "a new list item")
+
+    def test_redirects_after_POST(self):
+        response = self.client.post('/', data={'item_text': 'a new list item'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["location"], "/")
 
 
 class ItemModelTest(TestCase):
@@ -54,5 +61,15 @@ class ItemModelTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'a new list item')
 
-        self.assertIn('a new list item', response.content.decode())
-        self.assertTemplateUsed(response, 'home.html')
+        print("res  {}".format(response))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+
+    def test_displays_all_list_item(self):
+        Item.objects.create(text="item 1")
+        Item.objects.create(text="item 2")
+
+        response = self.client.get("/")
+
+        self.assertIn("item 1", response.content.decode())
+        self.assertIn("item 2", response.content.decode())
