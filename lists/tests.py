@@ -10,20 +10,6 @@ from .views import home_page
 
 class HomepageTest(TestCase):
 
-    # def test_root_url_resolves_to_home_page_view(self):
-    #     found = resolve('/')
-    #     //print("resolve func {}".format(found.func))
-    #     self.assertEqual(found.func, home_page)
-
-    # def test_home_page_return_correct_html(self):
-    #     request = HttpRequest()
-    #     response = self.client.get('/')
-    #     html = response.content.decode('utf8')
-    #     self.assertTrue(html.startswith('<!DOCTYPE html>'))
-    #     self.assertIn('<title>TO-DO</title>', html)
-    #     self.assertTrue(html.endswith('</html>'))
-    #     self.assertTemplateUsed(response, 'home.html')
-
     def test_uses_home_template(self):
         response = self.client.get("/")
         self.assertTemplateUsed(response, 'home.html')
@@ -73,3 +59,18 @@ class ItemModelTest(TestCase):
 
         self.assertIn("item 1", response.content.decode())
         self.assertIn("item 2", response.content.decode())
+
+
+class ListViewTest(TestCase):
+    def test_uses_list_templates(self):
+        response = self.client.get("/list/the-only-list/")
+        self.assertTemplateUsed(response, "list.html")
+
+    def test_display_all_item(self):
+        Item.objects.create(text="item 1")
+        Item.objects.create(text="item 2")
+
+        response = self.client.get("/list/the-only-list/")
+
+        self.assertContains(response, "item 1")
+        self.assertContains(response, "item 2")
